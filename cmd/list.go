@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
+	"strings"
+	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 )
@@ -37,7 +40,15 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println(header)
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
+		defer w.Flush()
+
+		if all {
+			fmt.Fprintln(w, strings.Join(header[:], "\t"))
+		} else {
+			fmt.Fprintln(w, strings.Join(header[:len(header)-1], "\t"))
+		}
+
 		for {
 			record, err := csvReader.Read()
 			if err == io.EOF {
@@ -47,7 +58,16 @@ var listCmd = &cobra.Command{
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
-			fmt.Println(record)
+			complete, err := strconv.ParseBool(record[len(record)-1])
+			if err != nil {
+				fmt.Fprint(os.Stderr, err)
+				return
+			}
+			if all {
+				fmt.Fprintln(w, strings.Join(record[:], "\t"))
+			} else if !complete {
+				fmt.Fprintln(w, strings.Join(record[:len(record)-1], "\t"))
+			}
 		}
 	},
 }

@@ -1,6 +1,5 @@
 /*
 Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -8,6 +7,10 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+)
+
+var (
+	all bool
 )
 
 // listCmd represents the list command
@@ -26,6 +29,7 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
+	listCmd.Flags().BoolVarP(&all, "all", "a", false, "include completed tasks")
 	rootCmd.AddCommand(listCmd)
 
 	// Here you will define your flags and configuration settings.

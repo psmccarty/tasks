@@ -1,6 +1,5 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2024 Patrick McCarty <patricksantos1234567@gmail.com>
 */
 package main
 

@@ -39,7 +39,7 @@ var completeCmd = &cobra.Command{
 
 		for i := 1; i < len(records); i++ {
 			if records[i][0] == args[0] {
-				complete, err := strconv.ParseBool(records[i][0])
+				complete, err := strconv.ParseBool(records[i][3])
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					return

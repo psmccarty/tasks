@@ -23,6 +23,7 @@ var deleteCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
+		defer f.Close()
 
 		csvReader := csv.NewReader(f)
 		records, err := csvReader.ReadAll()

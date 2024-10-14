@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var Tasks = "tasks.csv"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "tasks",

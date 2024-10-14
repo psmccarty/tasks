@@ -11,14 +11,9 @@ import (
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "add <description>",
+	Short: "Adds a task to the list",
+	Long:  `Adds a task to the todo list application with a short description.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("add called")
 	},

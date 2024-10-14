@@ -41,7 +41,6 @@ var listCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
-		defer w.Flush()
 
 		if all {
 			fmt.Fprintln(w, strings.Join(header[:], "\t"))
@@ -60,7 +59,7 @@ var listCmd = &cobra.Command{
 			}
 			complete, err := strconv.ParseBool(record[len(record)-1])
 			if err != nil {
-				fmt.Fprint(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, err)
 				return
 			}
 			if all {
@@ -69,6 +68,7 @@ var listCmd = &cobra.Command{
 				fmt.Fprintln(w, strings.Join(record[:len(record)-1], "\t"))
 			}
 		}
+		w.Flush()
 	},
 }
 

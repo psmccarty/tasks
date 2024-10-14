@@ -11,7 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
+	"time"
 
+	"github.com/mergestat/timediff"
 	"github.com/spf13/cobra"
 )
 
@@ -62,6 +64,14 @@ var listCmd = &cobra.Command{
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
+
+			createdAt, err := time.Parse(time.RFC3339, record[2])
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return
+			}
+			record[2] = timediff.TimeDiff(createdAt)
+
 			if all {
 				fmt.Fprintln(w, strings.Join(record[:], "\t"))
 			} else if !complete {

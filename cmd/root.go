@@ -4,6 +4,9 @@ Copyright © 2024 Patrick McCarty <patricksantos1234567@gmail.com>
 package cmd
 
 import (
+	"encoding/csv"
+	"fmt"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -27,4 +30,36 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	f, err := os.OpenFile(Tasks, os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	_, err = csvReader.Read()
+	if err != nil && err != io.EOF {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	} else if err == io.EOF {
+		csvWriter := csv.NewWriter(f)
+		err = f.Truncate(0)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		_, err = f.Seek(0, 0)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		err = csvWriter.Write([]string{"ID", "Task", "Created", "Done"})
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		csvWriter.Flush()
+	}
 }

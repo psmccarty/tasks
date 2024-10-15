@@ -3,3 +3,6 @@ tasks
 
 # vs code
 .vscode
+
+# db
+tasks.db

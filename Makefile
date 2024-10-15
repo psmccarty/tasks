@@ -1,4 +1,4 @@
-build:
+build: sqlc
 	go build -o tasks
 
 add:
@@ -12,3 +12,6 @@ complete:
 
 delete:
 	go run main.go delete
+
+sqlc: sql/query.sql sql/schema.sql
+	sqlc generate -f sql/sqlc.yml

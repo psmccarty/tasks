@@ -2,8 +2,13 @@
 SELECT * FROM tasks
 WHERE id = ? LIMIT 1;
 
--- name: ListTasks :many
+-- name: ListAllTasks :many
 SELECT * FROM tasks
+ORDER BY id;
+
+-- name: ListUncompletedTasks :many
+SELECT * FROM tasks
+WHERE completed_timestamp IS NULL
 ORDER BY id;
 
 -- name: DeleteTask :exec

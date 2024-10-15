@@ -66,13 +66,48 @@ func (q *Queries) GetTask(ctx context.Context, id int64) (Task, error) {
 	return i, err
 }
 
-const listTasks = `-- name: ListTasks :many
+const listAllTasks = `-- name: ListAllTasks :many
 SELECT id, description, create_timestamp, completed_timestamp, due_date_timestamp FROM tasks
 ORDER BY id
 `
 
-func (q *Queries) ListTasks(ctx context.Context) ([]Task, error) {
-	rows, err := q.db.QueryContext(ctx, listTasks)
+func (q *Queries) ListAllTasks(ctx context.Context) ([]Task, error) {
+	rows, err := q.db.QueryContext(ctx, listAllTasks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Task
+	for rows.Next() {
+		var i Task
+		if err := rows.Scan(
+			&i.ID,
+			&i.Description,
+			&i.CreateTimestamp,
+			&i.CompletedTimestamp,
+			&i.DueDateTimestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUncompletedTasks = `-- name: ListUncompletedTasks :many
+SELECT id, description, create_timestamp, completed_timestamp, due_date_timestamp FROM tasks
+WHERE completed_timestamp IS NULL
+ORDER BY id
+`
+
+func (q *Queries) ListUncompletedTasks(ctx context.Context) ([]Task, error) {
+	rows, err := q.db.QueryContext(ctx, listUncompletedTasks)
 	if err != nil {
 		return nil, err
 	}

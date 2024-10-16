@@ -9,10 +9,18 @@ import (
 	"fmt"
 	"os"
 	"text/tabwriter"
-	"time"
 
+	"github.com/mergestat/timediff"
 	"github.com/psmccarty/tasks/sql/gen"
 	"github.com/spf13/cobra"
+)
+
+const (
+	FullHeader   = "ID\tTask\tCreated\tDone"
+	FullTemplate = "%d\t%s\t%s\t%v\t\n"
+
+	ReducedHeader   = "ID\tTask\tCreated"
+	ReducedTemplate = "%d\t%s\t%s\t\n"
 )
 
 var (
@@ -51,9 +59,17 @@ var listCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
-		fmt.Fprintln(w, "ID\tTask\tCreated")
+		if all {
+			fmt.Fprintln(w, FullHeader)
+		} else {
+			fmt.Fprintln(w, ReducedHeader)
+		}
 		for _, t := range tasks {
-			fmt.Fprintf(w, "%d\t%s\t%s\n", t.ID, t.Description, t.CreateTimestamp.Format(time.RFC3339))
+			if all {
+				fmt.Fprintf(w, FullTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), t.CompletedTimestamp.Valid)
+			} else {
+				fmt.Fprintf(w, ReducedTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp))
+			}
 		}
 		w.Flush()
 	},

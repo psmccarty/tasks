@@ -35,12 +35,12 @@ var deleteCmd = &cobra.Command{
 
 		ctx := context.Background()
 		queries := gen.New(db)
-		res, err := queries.DeleteTask(ctx, int64(id))
+		description, err := queries.DeleteTask(ctx, int64(id))
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		fmt.Printf("Deleted task number %d, %q\n", res.ID, res.Description)
+		fmt.Printf("Deleted task number %d, %q\n", id, description)
 	},
 }
 

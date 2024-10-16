@@ -14,7 +14,7 @@ ORDER BY id;
 -- name: DeleteTask :one
 DELETE FROM tasks
 WHERE id = ?
-RETURNING id, description;
+RETURNING description;
 
 -- name: CreateTask :one
 INSERT INTO tasks (
@@ -28,4 +28,4 @@ RETURNING *;
 UPDATE tasks
 set completed_timestamp = ?
 WHERE id = ?
-RETURNING id, description;
+RETURNING description;

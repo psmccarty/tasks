@@ -41,19 +41,14 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, e
 const deleteTask = `-- name: DeleteTask :one
 DELETE FROM tasks
 WHERE id = ?
-RETURNING id, description
+RETURNING description
 `
 
-type DeleteTaskRow struct {
-	ID          int64
-	Description string
-}
-
-func (q *Queries) DeleteTask(ctx context.Context, id int64) (DeleteTaskRow, error) {
+func (q *Queries) DeleteTask(ctx context.Context, id int64) (string, error) {
 	row := q.db.QueryRowContext(ctx, deleteTask, id)
-	var i DeleteTaskRow
-	err := row.Scan(&i.ID, &i.Description)
-	return i, err
+	var description string
+	err := row.Scan(&description)
+	return description, err
 }
 
 const getTask = `-- name: GetTask :one
@@ -147,7 +142,7 @@ const updateComplete = `-- name: UpdateComplete :one
 UPDATE tasks
 set completed_timestamp = ?
 WHERE id = ?
-RETURNING id, description
+RETURNING description
 `
 
 type UpdateCompleteParams struct {
@@ -155,14 +150,9 @@ type UpdateCompleteParams struct {
 	ID                 int64
 }
 
-type UpdateCompleteRow struct {
-	ID          int64
-	Description string
-}
-
-func (q *Queries) UpdateComplete(ctx context.Context, arg UpdateCompleteParams) (UpdateCompleteRow, error) {
+func (q *Queries) UpdateComplete(ctx context.Context, arg UpdateCompleteParams) (string, error) {
 	row := q.db.QueryRowContext(ctx, updateComplete, arg.CompletedTimestamp, arg.ID)
-	var i UpdateCompleteRow
-	err := row.Scan(&i.ID, &i.Description)
-	return i, err
+	var description string
+	err := row.Scan(&description)
+	return description, err
 }

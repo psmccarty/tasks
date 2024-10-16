@@ -36,7 +36,7 @@ var completeCmd = &cobra.Command{
 
 		ctx := context.Background()
 		queries := gen.New(db)
-		res, err := queries.UpdateComplete(ctx, gen.UpdateCompleteParams{
+		description, err := queries.UpdateComplete(ctx, gen.UpdateCompleteParams{
 			ID:                 int64(id),
 			CompletedTimestamp: sql.NullTime{Time: time.Now(), Valid: true},
 		})
@@ -44,7 +44,7 @@ var completeCmd = &cobra.Command{
 			fmt.Println(err)
 			return
 		}
-		fmt.Printf("Completed task number %d, %q\n", res.ID, res.Description)
+		fmt.Printf("Completed task number %d, %q\n", id, description)
 	},
 }
 

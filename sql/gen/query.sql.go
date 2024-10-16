@@ -38,14 +38,22 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, e
 	return i, err
 }
 
-const deleteTask = `-- name: DeleteTask :exec
+const deleteTask = `-- name: DeleteTask :one
 DELETE FROM tasks
 WHERE id = ?
+RETURNING id, description
 `
 
-func (q *Queries) DeleteTask(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteTask, id)
-	return err
+type DeleteTaskRow struct {
+	ID          int64
+	Description string
+}
+
+func (q *Queries) DeleteTask(ctx context.Context, id int64) (DeleteTaskRow, error) {
+	row := q.db.QueryRowContext(ctx, deleteTask, id)
+	var i DeleteTaskRow
+	err := row.Scan(&i.ID, &i.Description)
+	return i, err
 }
 
 const getTask = `-- name: GetTask :one
@@ -135,10 +143,11 @@ func (q *Queries) ListUncompletedTasks(ctx context.Context) ([]Task, error) {
 	return items, nil
 }
 
-const updateComplete = `-- name: UpdateComplete :exec
+const updateComplete = `-- name: UpdateComplete :one
 UPDATE tasks
 set completed_timestamp = ?
 WHERE id = ?
+RETURNING id, description
 `
 
 type UpdateCompleteParams struct {
@@ -146,7 +155,14 @@ type UpdateCompleteParams struct {
 	ID                 int64
 }
 
-func (q *Queries) UpdateComplete(ctx context.Context, arg UpdateCompleteParams) error {
-	_, err := q.db.ExecContext(ctx, updateComplete, arg.CompletedTimestamp, arg.ID)
-	return err
+type UpdateCompleteRow struct {
+	ID          int64
+	Description string
+}
+
+func (q *Queries) UpdateComplete(ctx context.Context, arg UpdateCompleteParams) (UpdateCompleteRow, error) {
+	row := q.db.QueryRowContext(ctx, updateComplete, arg.CompletedTimestamp, arg.ID)
+	var i UpdateCompleteRow
+	err := row.Scan(&i.ID, &i.Description)
+	return i, err
 }

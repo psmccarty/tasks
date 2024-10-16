@@ -11,9 +11,10 @@ SELECT * FROM tasks
 WHERE completed_timestamp IS NULL
 ORDER BY id;
 
--- name: DeleteTask :exec
+-- name: DeleteTask :one
 DELETE FROM tasks
-WHERE id = ?;
+WHERE id = ?
+RETURNING id, description;
 
 -- name: CreateTask :one
 INSERT INTO tasks (
@@ -23,7 +24,8 @@ INSERT INTO tasks (
 )
 RETURNING *;
 
--- name: UpdateComplete :exec
+-- name: UpdateComplete :one
 UPDATE tasks
 set completed_timestamp = ?
-WHERE id = ?;
+WHERE id = ?
+RETURNING id, description;

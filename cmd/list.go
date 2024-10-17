@@ -11,7 +11,6 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/mergestat/timediff"
 	"github.com/psmccarty/tasks/sql/gen"
 	"github.com/spf13/cobra"
@@ -61,21 +60,16 @@ var listCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
-		c := color.New(color.FgWhite)
 		if all {
-			c.Fprintf(w, FullHeader)
+			fmt.Fprint(w, FullHeader)
 		} else {
-			c.Fprintf(w, ReducedHeader)
+			fmt.Fprint(w, ReducedHeader)
 		}
 		for _, t := range tasks {
 
 			var dueDateString string
-			c := color.New(color.FgWhite)
 			if t.DueDateTimestamp.Valid {
 				dueDateString = timediff.TimeDiff(t.DueDateTimestamp.Time)
-				if time.Since(t.DueDateTimestamp.Time).Hours() > -1 && time.Since(t.DueDateTimestamp.Time).Hours() < 0 {
-					c = color.New(color.FgYellow)
-				}
 			} else {
 				dueDateString = "-"
 			}
@@ -102,17 +96,15 @@ var listCmd = &cobra.Command{
 
 				if lateSince < 0 {
 					completedOnString = fmt.Sprintf("%s early", lateSince.Abs().Round(rounding))
-					c = color.New(color.FgGreen)
 				} else {
 					completedOnString = fmt.Sprintf("%s late", lateSince.Round(rounding))
-					c = color.New(color.FgRed)
 				}
 			}
 
 			if all {
-				c.Fprintf(w, FullTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueDateString, completedOnString)
+				fmt.Fprintf(w, FullTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueDateString, completedOnString)
 			} else {
-				c.Fprintf(w, ReducedTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueDateString)
+				fmt.Fprintf(w, ReducedTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueDateString)
 			}
 		}
 		w.Flush()

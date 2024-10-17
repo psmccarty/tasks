@@ -29,7 +29,7 @@ var addCmd = &cobra.Command{
 
 		ctx := context.Background()
 		queries := gen.New(db)
-		task, err := queries.CreateTask(ctx, gen.CreateTaskParams{
+		err = queries.CreateTask(ctx, gen.CreateTaskParams{
 			Description:     args[0],
 			CreateTimestamp: time.Now(),
 		})
@@ -37,7 +37,6 @@ var addCmd = &cobra.Command{
 			fmt.Println(err)
 			return
 		}
-		fmt.Println(task)
 	},
 }
 

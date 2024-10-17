@@ -16,7 +16,7 @@ DELETE FROM tasks
 WHERE id = ?
 RETURNING description;
 
--- name: CreateTask :one
+-- name: CreateTask :exec
 INSERT INTO tasks (
   description, create_timestamp
 ) VALUES (

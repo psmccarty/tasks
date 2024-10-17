@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const createTask = `-- name: CreateTask :one
+const createTask = `-- name: CreateTask :exec
 INSERT INTO tasks (
   description, create_timestamp
 ) VALUES (
@@ -25,17 +25,9 @@ type CreateTaskParams struct {
 	CreateTimestamp time.Time
 }
 
-func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, error) {
-	row := q.db.QueryRowContext(ctx, createTask, arg.Description, arg.CreateTimestamp)
-	var i Task
-	err := row.Scan(
-		&i.ID,
-		&i.Description,
-		&i.CreateTimestamp,
-		&i.CompletedTimestamp,
-		&i.DueDateTimestamp,
-	)
-	return i, err
+func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
+	_, err := q.db.ExecContext(ctx, createTask, arg.Description, arg.CreateTimestamp)
+	return err
 }
 
 const deleteTask = `-- name: DeleteTask :one

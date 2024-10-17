@@ -13,20 +13,21 @@ import (
 
 const createTask = `-- name: CreateTask :exec
 INSERT INTO tasks (
-  description, create_timestamp
+  description, create_timestamp, due_date_timestamp
 ) VALUES (
-  ?, ?
+  ?, ?, ?
 )
 RETURNING id, description, create_timestamp, completed_timestamp, due_date_timestamp
 `
 
 type CreateTaskParams struct {
-	Description     string
-	CreateTimestamp time.Time
+	Description      string
+	CreateTimestamp  time.Time
+	DueDateTimestamp sql.NullTime
 }
 
 func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
-	_, err := q.db.ExecContext(ctx, createTask, arg.Description, arg.CreateTimestamp)
+	_, err := q.db.ExecContext(ctx, createTask, arg.Description, arg.CreateTimestamp, arg.DueDateTimestamp)
 	return err
 }
 

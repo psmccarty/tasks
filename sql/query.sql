@@ -18,9 +18,9 @@ RETURNING description;
 
 -- name: CreateTask :exec
 INSERT INTO tasks (
-  description, create_timestamp
+  description, create_timestamp, due_date_timestamp
 ) VALUES (
-  ?, ?
+  ?, ?, ?
 )
 RETURNING *;
 

@@ -14,6 +14,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var dueDateString string
+
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add <description>",
@@ -29,9 +31,26 @@ var addCmd = &cobra.Command{
 
 		ctx := context.Background()
 		queries := gen.New(db)
+
+		var dueDate time.Time
+		validDate := false
+		if dueDateString != "" {
+			duration, err := time.ParseDuration(dueDateString)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			dueDate = time.Now().Add(duration)
+			validDate = true
+		}
+
 		err = queries.CreateTask(ctx, gen.CreateTaskParams{
 			Description:     args[0],
 			CreateTimestamp: time.Now(),
+			DueDateTimestamp: sql.NullTime{
+				Time:  dueDate,
+				Valid: validDate,
+			},
 		})
 		if err != nil {
 			fmt.Println(err)
@@ -42,4 +61,5 @@ var addCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(addCmd)
+	addCmd.Flags().StringVarP(&dueDateString, "due", "d", "", "Due date of task")
 }

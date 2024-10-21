@@ -31,6 +31,15 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
 	return err
 }
 
+const deleteList = `-- name: DeleteList :exec
+DROP TABLE tasks
+`
+
+func (q *Queries) DeleteList(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteList)
+	return err
+}
+
 const deleteTask = `-- name: DeleteTask :one
 DELETE FROM tasks
 WHERE id = ?

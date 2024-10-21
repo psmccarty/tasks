@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	all bool
+	listAll bool
 )
 
 // listCmd represents the list command
@@ -46,7 +46,7 @@ var listCmd = &cobra.Command{
 		queries := gen.New(db)
 
 		var tasks []gen.Task
-		if all {
+		if listAll {
 			tasks, err = queries.ListAllTasks(ctx)
 			if err != nil {
 				fmt.Println(err)
@@ -61,14 +61,14 @@ var listCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
-		if all {
+		if listAll {
 			fmt.Fprint(w, FullHeader)
 		} else {
 			fmt.Fprint(w, ReducedHeader)
 		}
 		for _, t := range tasks {
 			dueOn, completedOn := dueAndCompletedStrings(t)
-			if all {
+			if listAll {
 				fmt.Fprintf(w, FullTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueOn, completedOn)
 			} else {
 				fmt.Fprintf(w, ReducedTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueOn)
@@ -114,6 +114,6 @@ func dueAndCompletedStrings(t gen.Task) (string, string) {
 }
 
 func init() {
+	listCmd.Flags().BoolVarP(&listAll, "all", "a", false, "include completed tasks")
 	rootCmd.AddCommand(listCmd)
-	listCmd.Flags().BoolVarP(&all, "all", "a", false, "include completed tasks")
 }

@@ -16,6 +16,9 @@ DELETE FROM tasks
 WHERE id = ?
 RETURNING description;
 
+-- name: DeleteList :exec
+DROP TABLE tasks;
+
 -- name: CreateTask :exec
 INSERT INTO tasks (
   description, create_timestamp, due_date_timestamp

@@ -61,62 +61,56 @@ var listCmd = &cobra.Command{
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
-		c := color.New(color.FgWhite)
 		if all {
-			c.Fprintf(w, FullHeader)
+			fmt.Fprint(w, FullHeader)
 		} else {
-			c.Fprintf(w, ReducedHeader)
+			fmt.Fprint(w, ReducedHeader)
 		}
 		for _, t := range tasks {
-
-			var dueDateString string
-			c := color.New(color.FgWhite)
-			if t.DueDateTimestamp.Valid {
-				dueDateString = timediff.TimeDiff(t.DueDateTimestamp.Time)
-				if time.Since(t.DueDateTimestamp.Time).Hours() > -1 && time.Since(t.DueDateTimestamp.Time).Hours() < 0 {
-					c = color.New(color.FgYellow)
-				}
-			} else {
-				dueDateString = "-"
-			}
-
-			var completedOnString string
-			if t.CompletedTimestamp.Valid {
-				completedOnString = timediff.TimeDiff(t.CompletedTimestamp.Time)
-			} else {
-				completedOnString = "-"
-			}
-
-			if t.DueDateTimestamp.Valid && t.CompletedTimestamp.Valid {
-				completedSince := time.Since(t.DueDateTimestamp.Time)
-				dueSince := time.Since(t.CompletedTimestamp.Time)
-				lateSince := completedSince - dueSince
-
-				rounding := time.Second
-
-				if lateSince.Abs().Hours() >= 1 {
-					rounding = time.Hour
-				} else if lateSince.Abs().Minutes() >= 1 {
-					rounding = time.Minute
-				}
-
-				if lateSince < 0 {
-					completedOnString = fmt.Sprintf("%s early", lateSince.Abs().Round(rounding))
-					c = color.New(color.FgGreen)
-				} else {
-					completedOnString = fmt.Sprintf("%s late", lateSince.Round(rounding))
-					c = color.New(color.FgRed)
-				}
-			}
-
+			dueOn, completedOn := dueAndCompletedStrings(t)
 			if all {
-				c.Fprintf(w, FullTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueDateString, completedOnString)
+				fmt.Fprintf(w, FullTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueOn, completedOn)
 			} else {
-				c.Fprintf(w, ReducedTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueDateString)
+				fmt.Fprintf(w, ReducedTemplate, t.ID, t.Description, timediff.TimeDiff(t.CreateTimestamp), dueOn)
 			}
 		}
 		w.Flush()
 	},
+}
+
+func dueAndCompletedStrings(t gen.Task) (string, string) {
+
+	if !t.DueDateTimestamp.Valid && !t.CompletedTimestamp.Valid {
+		return "-", "-"
+	}
+
+	if !t.DueDateTimestamp.Valid {
+		return "-", timediff.TimeDiff(t.CompletedTimestamp.Time)
+	}
+
+	dueSince := time.Since(t.DueDateTimestamp.Time)
+	if !t.CompletedTimestamp.Valid {
+		return timediff.TimeDiff(t.DueDateTimestamp.Time), "-"
+	}
+
+	completedSince := time.Since(t.CompletedTimestamp.Time)
+	diff := completedSince - dueSince
+
+	rounding := time.Second
+	if diff.Abs().Hours() >= 1 {
+		rounding = time.Hour
+	} else if diff.Abs().Minutes() >= 1 {
+		rounding = time.Minute
+	}
+
+	if dueSince < completedSince {
+		c := color.New(color.FgGreen)
+		return timediff.TimeDiff(t.DueDateTimestamp.Time), c.Sprintf("%s early", diff.Abs().Round(rounding))
+	} else {
+		c := color.New(color.FgRed)
+		return timediff.TimeDiff(t.DueDateTimestamp.Time), c.Sprintf("%s late", diff.Abs().Round(rounding))
+	}
+
 }
 
 func init() {
